@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.vilan.pablo.technology.store.model.exceptions.DuplicateInstanceException;
+import com.vilan.pablo.technology.store.model.exceptions.IncorrectLoginException;
+import com.vilan.pablo.technology.store.model.exceptions.IncorrectPasswordException;
 import com.vilan.pablo.technology.store.model.exceptions.InstanceNotFoundException;
 import com.vilan.pablo.technology.store.model.exceptions.PermissionException;
 import com.vilan.pablo.technology.store.rest.dtos.ErrorsDto;

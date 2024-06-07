@@ -20,8 +20,6 @@ import com.vilan.pablo.technology.store.rest.dtos.ErrorsDto;
 import com.vilan.pablo.technology.store.rest.dtos.FieldErrorDto;
 
 
-
-
 @ControllerAdvice
 public class CommonControllerAdvice {
 	
@@ -77,6 +75,28 @@ public class CommonControllerAdvice {
 		
 		String errorMessage = messageSource.getMessage(PERMISSION_EXCEPTION_CODE, null, PERMISSION_EXCEPTION_CODE,
 			locale);
+
+		return new ErrorsDto(errorMessage);
+		
+	}
+
+	@ExceptionHandler(IncorrectLoginException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseBody
+	public ErrorsDto handleIncorrectLoginException(IncorrectLoginException exception) {
+		
+		String errorMessage = "Error: Incorrect Login";
+
+		return new ErrorsDto(errorMessage);
+		
+	}
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ResponseBody
+	public ErrorsDto handleIncorrectPasswordException(IncorrectPasswordException exception) {
+		
+		String errorMessage = "Error: Incorrect Password Exception";
 
 		return new ErrorsDto(errorMessage);
 		

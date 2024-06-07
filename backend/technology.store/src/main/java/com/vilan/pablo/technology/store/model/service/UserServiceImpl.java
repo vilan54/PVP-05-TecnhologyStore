@@ -10,6 +10,7 @@ import java.net.URL;
 import javax.management.InstanceNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonElement;
@@ -27,9 +28,14 @@ import com.vilan.pablo.technology.store.model.exceptions.IncorrectPasswordExcept
 @Service
 public class UserServiceImpl implements UserService{
 
-    private static final String BASE_URL = "https://www.googleapis.com/identitytoolkit/v3/relyingparty/";
-    private static final String OPERATION_AUTH = "verifyPassword";
-    private static final String firebaseKey = "AIzaSyC0PXqQSfdKfk02MM93_ObZBKThst3k93M";
+    @Value("${firebase.base-url}")
+    private String baseUrl;
+
+    @Value("${firebase.operation-auth}")
+    private String operationAuth;
+
+    @Value("${firebase.api-key}")
+    private String firebaseKey;
 
     @Autowired
     private PermissionChecker permissionChecker;
@@ -59,7 +65,7 @@ public class UserServiceImpl implements UserService{
     String token = null;
 
     try {
-        URL url = new URL(BASE_URL + OPERATION_AUTH + "?key=" + firebaseKey);
+        URL url = new URL(baseUrl + operationAuth + "?key=" + firebaseKey);
         urlRequest = (HttpURLConnection) url.openConnection();
         urlRequest.setDoOutput(true);
         urlRequest.setRequestProperty("Content-type", "application/json; charset=UTF-8");

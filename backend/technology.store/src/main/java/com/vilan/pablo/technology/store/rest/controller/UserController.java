@@ -13,16 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.http.HttpStatus;
 
 import com.google.firebase.auth.FirebaseAuthException;
 import com.vilan.pablo.technology.store.model.entities.User;
 import com.vilan.pablo.technology.store.model.exceptions.DuplicateInstanceException;
 import com.vilan.pablo.technology.store.model.exceptions.IncorrectLoginException;
-import com.vilan.pablo.technology.store.model.exceptions.IncorrectPasswordException;
 import com.vilan.pablo.technology.store.model.service.UserService;
 import com.vilan.pablo.technology.store.rest.dtos.AuthenticatedUserDto;
-import com.vilan.pablo.technology.store.rest.dtos.ErrorsDto;
 import com.vilan.pablo.technology.store.rest.dtos.LoginParamsDto;
 import com.vilan.pablo.technology.store.rest.dtos.UserDto;
 
@@ -32,28 +29,6 @@ public class UserController {
     
     @Autowired
 	private UserService userService;
-
-    @ExceptionHandler(IncorrectLoginException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ResponseBody
-	public ErrorsDto handleIncorrectLoginException(IncorrectLoginException exception) {
-		
-		String errorMessage = "Error: Incorrect Login";
-
-		return new ErrorsDto(errorMessage);
-		
-	}
-
-    @ExceptionHandler(IncorrectPasswordException.class)
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ResponseBody
-	public ErrorsDto handleIncorrectPasswordException(IncorrectPasswordException exception) {
-		
-		String errorMessage = "Error: Incorrect Password Exception";
-
-		return new ErrorsDto(errorMessage);
-		
-	}
 
     @PostMapping("/signUp")
 	public ResponseEntity<AuthenticatedUserDto> signUp(

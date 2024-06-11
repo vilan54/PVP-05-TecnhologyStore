@@ -3,28 +3,28 @@ package com.vilan.pablo.technology.store.rest.dtos;
 import jakarta.validation.constraints.NotNull;
 
 public class LoginParamsDto {
-	
-	private String userName;
-	private String password;
-	
-	public LoginParamsDto() {}
 
-	@NotNull
-	public String getUserName() {
-		return userName;
-	}
+    @NotNull
+    private String email;
 
-	public void setUserName(String userName) {
-		this.userName = userName.trim();
-	}
+    @NotNull
+    private String password;
 
-	@NotNull
-	public String getPassword() {
-		return password;
-	}
+    public LoginParamsDto() {}
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public String getEmail() {
+        return email;
+    }
 
+    public void setEmail(String email) {
+        this.email = email.trim();
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

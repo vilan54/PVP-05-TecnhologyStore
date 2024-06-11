@@ -1,25 +1,20 @@
 package com.vilan.pablo.technology.store.rest.controller;
 
-import java.net.URI;
-
-import javax.management.InstanceNotFoundException;
-
 import static com.vilan.pablo.technology.store.rest.dtos.UserConversor.toUser;
 import static com.vilan.pablo.technology.store.rest.dtos.UserConversor.toAuthenticatedUserDto;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import com.google.firebase.auth.FirebaseAuthException;
 import com.vilan.pablo.technology.store.model.entities.User;
-import com.vilan.pablo.technology.store.model.exceptions.DuplicateInstanceException;
-import com.vilan.pablo.technology.store.model.exceptions.IncorrectLoginException;
+import com.vilan.pablo.technology.store.model.exceptions.PermissionException;
+import com.vilan.pablo.technology.store.model.service.PermissionChecker;
 import com.vilan.pablo.technology.store.model.service.UserService;
 import com.vilan.pablo.technology.store.rest.dtos.AuthenticatedUserDto;
+import com.vilan.pablo.technology.store.rest.dtos.ChangePasswordParamsDto;
 import com.vilan.pablo.technology.store.rest.dtos.LoginParamsDto;
 import com.vilan.pablo.technology.store.rest.dtos.UserDto;
 
@@ -30,32 +25,46 @@ public class UserController {
     @Autowired
 	private UserService userService;
 
+	@Autowired
+	private PermissionChecker permissionChecker;
+
     @PostMapping("/signUp")
-	public ResponseEntity<AuthenticatedUserDto> signUp(
-		@Validated({UserDto.AllValidations.class}) @RequestBody UserDto userDto) throws DuplicateInstanceException, InstanceNotFoundException, FirebaseAuthException, IncorrectLoginException {
+	public ResponseEntity<AuthenticatedUserDto> signUp(@Validated @RequestBody UserDto params) throws Exception {
 		
-		User user = toUser(userDto);
+		User user = toUser(params);
 		
-		String token = userService.signUp(user);
-		
-		URI location = ServletUriComponentsBuilder
-			.fromCurrentRequest().path("/{id}")
-			.buildAndExpand(user.getEmail()).toUri();   
-	
-		return ResponseEntity.created(location).body(toAuthenticatedUserDto(token, user));
+		UserDto userDto = userService.signUp(user);
+		   
+		return ResponseEntity.ok(toAuthenticatedUserDto(permissionChecker.getServiceToken(params.getEmail(), params.getPassword()), userDto));
 
 	}
 
     @PostMapping("/login")
-	public AuthenticatedUserDto login(@Validated @RequestBody LoginParamsDto params)
-	    throws IncorrectLoginException {
+	public AuthenticatedUserDto login(@Validated @RequestBody LoginParamsDto params) throws Exception {
 		
-		String token = userService.login(params.getUserName(), params.getPassword());
-		
-        User user = new User(params.getUserName(), params.getPassword());
-
-		return toAuthenticatedUserDto(token, user);
+		UserDto userDto = userService.login(params.getEmail(), params.getPassword());
+		return toAuthenticatedUserDto(permissionChecker.getServiceToken(params.getEmail(), params.getPassword()), userDto);
 		
 	}
+
+
+	@PostMapping("/{id}/changePassword")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void secureEndpoint(@RequestHeader("Authorization") String authorizationHeader, @PathVariable String id,
+													@RequestBody ChangePasswordParamsDto params) throws Exception {
+        
+													
+		String idToken = authorizationHeader.replace("Bearer ", "");
+        String userId = permissionChecker.getUserIdFromToken(idToken);
+		
+		if (!id.equals(userId)) {
+			throw new PermissionException();
+		}
+		
+		userService.changePassword(userId, params.getNewPassword());
+        
+    }
+
+
 
 }
